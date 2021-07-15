@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+
 const User = require("../model/user");
 
 module.exports = {
@@ -82,14 +83,14 @@ module.exports = {
   }, // handle update user by Id
   user_update: async (req, res, next) => {
     const { userId } = req.params;
-    let { password } = req.body || "";
+    req.body.image = req.file.path;
     try {
-      if (password) {
-        password = await bcrypt.hash(req.body.password, 10); // hash password by brycpt
+      if (req.body.password) {
+        req.body.password = await bcrypt.hash(req.body.password, 10); // hash password by brycpt
       }
       const user = await User.updateOne(
         { _id: userId },
-        { $set: { ...req.body, password } }
+        { $set: { ...req.body } }
       );
       res.status(200).json({ message: "Updated", user });
     } catch (error) {
