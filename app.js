@@ -32,9 +32,15 @@ app.use((req, res, next) => {
 
 const userRoute = require("./api/routes/user");
 const categoryRoute = require("./api/routes/category");
+const colorRoute = require("./api/routes/color");
+const sizeRoute = require("./api/routes/size");
+const productRoute = require("./api/routes/products");
 
 app.use("/user", userRoute);
 app.use("/category", categoryRoute);
+app.use("/color", colorRoute);
+app.use("/size", sizeRoute);
+app.use("/product", productRoute);
 
 app.use((req, res, next) => {
   const error = new Error("Not Found");
