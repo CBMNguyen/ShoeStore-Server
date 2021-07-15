@@ -24,7 +24,13 @@ const userSchema = new mongoose.Schema(
     },
     image: { type: String, default: "" },
     address: { type: String, required: true },
-    orderAddress: { type: String, required: true },
+    orderAddress: {
+      fullname: { type: String, default: "" },
+      city: { type: String, default: "" },
+      district: { type: String, default: "" },
+      commune: { type: String, default: "" },
+      description: { type: String, default: "" },
+    },
   },
   {
     versionKey: false,
