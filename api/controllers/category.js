@@ -23,7 +23,7 @@ module.exports = {
   category_delete: async (req, res) => {
     const { categoryId } = req.params;
     try {
-      await Category.remove({ _id: categoryId });
+      await Category.deleteOne({ _id: categoryId });
       res.status(200).json({ message: "Category deleted" });
     } catch (error) {
       res.status(500).json({ error });

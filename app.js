@@ -5,10 +5,14 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 require("dotenv").config();
 
+mongoose.set("useNewUrlParser", true);
+mongoose.set("useFindAndModify", false);
+mongoose.set("useCreateIndex", true);
+
 mongoose.connect(
   // connect mongodb atlas
   `mongodb+srv://CBMNguyen:${process.env.MONGO_ATLAS_PW}@cluster0.9ctcl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
-  { useNewUrlParser: true, useUnifiedTopology: true },
+  { useUnifiedTopology: true },
   () => console.log(" Mongoose is connected")
 );
 
@@ -40,7 +44,7 @@ app.use("/user", userRoute);
 app.use("/category", categoryRoute);
 app.use("/color", colorRoute);
 app.use("/size", sizeRoute);
-app.use("/product", productRoute);
+app.use("/products", productRoute);
 
 app.use((req, res, next) => {
   const error = new Error("Not Found");

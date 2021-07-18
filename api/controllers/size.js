@@ -23,7 +23,7 @@ module.exports = {
   size_delete: async (req, res) => {
     const { sizeId } = req.params;
     try {
-      await Size.remove({ _id: sizeId });
+      await Size.deleteOne({ _id: sizeId });
       res.status(200).json({ message: "Size created" });
     } catch (error) {
       res.status(500).json({ error });

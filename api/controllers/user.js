@@ -100,7 +100,7 @@ module.exports = {
   user_delete: async (req, res, next) => {
     const { userId } = req.params;
     try {
-      await User.remove({ _id: userId });
+      await User.deleteOne({ _id: userId });
       res.status(200).json({ message: "User deleted" });
     } catch (error) {
       res.status(500).json({ error });

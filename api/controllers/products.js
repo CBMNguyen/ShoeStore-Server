@@ -1,10 +1,11 @@
 const Product = require("../model/product");
+const Category = require("../model/category");
 
 module.exports = {
   // handle get all Product
   product_getAll: async (req, res) => {
     try {
-      const products = await Product.find();
+      const products = await Product.find().populate("color", "color");
       const page = req.query.page || 1;
       const limit = req.query.limit || products.length;
 
@@ -51,13 +52,29 @@ module.exports = {
       description,
       quantityStock,
     } = req.body;
+
+    if (req.files) {
+      const files = req.files.map((file) => {
+        return file.path;
+      });
+      req.body.images = files;
+    }
+
     try {
+      const isCategory = await Category.findById({ _id: category });
+      if (!isCategory) {
+        return res
+          .status(404)
+          .json({ message: "No valid entry found for provided CategoryId" });
+      }
       const newProduct = new Product({
         category,
         name,
         originalPrice,
         promotionPercent,
-        salePrice: originalPrice * (1 - promotionPercent),
+        salePrice: Math.ceil(
+          originalPrice * (1 - parseInt(promotionPercent) / 100)
+        ),
         isFreeShip,
         images,
         color,
@@ -90,7 +107,7 @@ module.exports = {
   product_delete: async (req, res) => {
     const { productId } = req.params;
     try {
-      const product = await Product.remove({ _id: productId });
+      const product = await Product.deleteOne({ _id: productId });
       res.status(200).json({ message: "Product deleted", product });
     } catch (error) {
       res.status(500).json({ error });

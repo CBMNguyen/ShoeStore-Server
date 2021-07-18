@@ -23,7 +23,7 @@ module.exports = {
   color_delete: async (req, res) => {
     const { colorId } = req.params;
     try {
-      await Color.remove({ _id: colorId });
+      await Color.deleteOne({ _id: colorId });
       res.status(200).json({ message: "Color created" });
     } catch (error) {
       res.status(500).json({ error });
