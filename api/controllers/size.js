@@ -40,7 +40,7 @@ module.exports = {
     const { sizeId } = req.params;
     try {
       await Size.deleteOne({ _id: sizeId });
-      res.status(200).json({ message: "Size created" });
+      res.status(200).json({ message: "Size deleted" });
     } catch (error) {
       res.status(500).json({ error });
     }

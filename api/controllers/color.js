@@ -40,7 +40,7 @@ module.exports = {
     const { colorId } = req.params;
     try {
       await Color.deleteOne({ _id: colorId });
-      res.status(200).json({ message: "Color created" });
+      res.status(200).json({ message: "Color deleted" });
     } catch (error) {
       res.status(500).json({ error });
     }

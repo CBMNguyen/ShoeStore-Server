@@ -24,20 +24,22 @@ app.use(bodyParser.json());
 app.use(cors());
 
 const userRoute = require("./api/routes/user");
+const employeeRoute = require("./api/routes/employee");
 const categoryRoute = require("./api/routes/category");
 const colorRoute = require("./api/routes/color");
 const sizeRoute = require("./api/routes/size");
 const positionRoute = require("./api/routes/position");
 const productRoute = require("./api/routes/products");
-const employeeRoute = require("./api/routes/employee");
+const cartRoute = require("./api/routes/cart");
 
 app.use("/user", userRoute);
+app.use("/employee", employeeRoute);
 app.use("/category", categoryRoute);
 app.use("/color", colorRoute);
 app.use("/size", sizeRoute);
 app.use("/position", positionRoute);
 app.use("/products", productRoute);
-app.use("/employee", employeeRoute);
+app.use("/cart", cartRoute);
 
 app.use((req, res, next) => {
   const error = new Error("Not Found");
