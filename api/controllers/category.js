@@ -15,11 +15,28 @@ module.exports = {
     try {
       const newCategory = new Category({ name });
       await newCategory.save();
-      res.status(200).json({ message: "Created category sucessfully" });
+      res.status(200).json({ message: "Created category sucessfully", newCategory });
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle delete category
+  },
+   // handle update category
+  category_update: async (req, res) => {
+    const { categoryId } = req.params;
+    try {
+      const categoryUpdated = await Category.updateOne(
+        { _id: categoryId },
+        {
+          $set: {
+            ...req.body,
+          },
+        })
+      res.status(200).json({ message: "Updated Category", categoryUpdated });
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  },
+  // handle delete category
   category_delete: async (req, res) => {
     const { categoryId } = req.params;
     try {

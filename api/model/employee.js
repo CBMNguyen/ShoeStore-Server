@@ -4,6 +4,8 @@ const employeeSchema = new mongoose.Schema(
   {
     firstname: { type: String, required: true },
     lastname: { type: String, required: true },
+    gender: { type: String, required: true },
+    birthdate: {type: Date, required: true},
     email: {
       type: String,
       required: true,
@@ -11,17 +13,15 @@ const employeeSchema = new mongoose.Schema(
       match:
         /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
     },
-    password: { type: String, default: "shoesshop@2000" },
     address: { type: String, required: true },
     phone: {
-      type: Number,
+      type: String,
       required: true,
       unique: true,
       match: /^0[0-9]{9}$/,
     },
     image: { type: String, default: "" },
-    salary: { type: Number, required: true },
-    position: { type: String, required: true },
+    position: { type: mongoose.Schema.Types.ObjectId, ref: "Position" },
   },
   {
     versionKey: false,

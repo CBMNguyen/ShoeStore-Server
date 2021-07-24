@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 require("dotenv").config();
@@ -18,33 +19,25 @@ mongoose.connect(
 
 app.use(morgan("dev"));
 app.use("/uploads", express.static("uploads"));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
-    return res.status(200).json({});
-  }
-  next();
-});
+app.use(cors());
 
 const userRoute = require("./api/routes/user");
 const categoryRoute = require("./api/routes/category");
 const colorRoute = require("./api/routes/color");
 const sizeRoute = require("./api/routes/size");
+const positionRoute = require("./api/routes/position");
 const productRoute = require("./api/routes/products");
+const employeeRoute = require("./api/routes/employee");
 
 app.use("/user", userRoute);
 app.use("/category", categoryRoute);
 app.use("/color", colorRoute);
 app.use("/size", sizeRoute);
+app.use("/position", positionRoute);
 app.use("/products", productRoute);
+app.use("/employee", employeeRoute);
 
 app.use((req, res, next) => {
   const error = new Error("Not Found");

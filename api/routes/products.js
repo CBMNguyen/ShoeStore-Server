@@ -10,7 +10,7 @@ router.get("/:productId", productController.product_getById);
 
 router.post("/", upload.array("images", 12), productController.product_create);
 
-router.patch("/:productId", productController.product_update);
+router.patch("/:productId", upload.array("images", 12), productController.product_update);
 
 router.delete("/:productId", productController.product_delete);
 

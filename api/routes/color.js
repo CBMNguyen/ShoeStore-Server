@@ -7,6 +7,8 @@ router.get("/", colorController.color_getAll);
 
 router.post("/", colorController.color_create);
 
+router.patch("/:colorId", colorController.color_update);
+
 router.delete("/:colorId", colorController.color_delete);
 
 module.exports = router;
