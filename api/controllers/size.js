@@ -5,7 +5,7 @@ module.exports = {
   size_getAll: async (req, res) => {
     try {
       const sizes = await Size.find();
-      res.status(200).json({ sizes });
+      res.status(200).json({ message: "Fetch size successfully.", sizes });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -15,7 +15,7 @@ module.exports = {
     try {
       const newSize = new Size({ size });
       await newSize.save();
-      res.status(201).json({ message: "Size created", newSize });
+      res.status(201).json({ message: "Added a new size.", newSize });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -29,8 +29,9 @@ module.exports = {
           $set: {
             ...req.body,
           },
-        })
-      res.status(200).json({ message: "Updated Size", sizeUpdated });
+        }
+      );
+      res.status(200).json({ message: "Size updated.", sizeUpdated });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -40,7 +41,7 @@ module.exports = {
     const { sizeId } = req.params;
     try {
       await Size.deleteOne({ _id: sizeId });
-      res.status(200).json({ message: "Size deleted" });
+      res.status(200).json({ message: "Size deleted." });
     } catch (error) {
       res.status(500).json({ error });
     }

@@ -5,7 +5,9 @@ module.exports = {
   category_getAll: async (req, res) => {
     try {
       const categories = await Category.find();
-      res.status(200).json({ categories });
+      res
+        .status(200)
+        .json({ message: "Fetch catelogy successfully.", categories });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -15,12 +17,12 @@ module.exports = {
     try {
       const newCategory = new Category({ name });
       await newCategory.save();
-      res.status(200).json({ message: "Created category sucessfully", newCategory });
+      res.status(200).json({ message: "Added a new category.", newCategory });
     } catch (error) {
       res.status(500).json({ error });
     }
   },
-   // handle update category
+  // handle update category
   category_update: async (req, res) => {
     const { categoryId } = req.params;
     try {
@@ -30,8 +32,9 @@ module.exports = {
           $set: {
             ...req.body,
           },
-        })
-      res.status(200).json({ message: "Updated Category", categoryUpdated });
+        }
+      );
+      res.status(200).json({ message: "Category updated", categoryUpdated });
     } catch (error) {
       res.status(500).json({ error });
     }

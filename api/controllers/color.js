@@ -5,7 +5,7 @@ module.exports = {
   color_getAll: async (req, res) => {
     try {
       const colors = await Color.find();
-      res.status(200).json({ colors });
+      res.status(200).json({ message: "Fetch color successfully.", colors });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -15,12 +15,12 @@ module.exports = {
     try {
       const newColor = new Color({ color });
       await newColor.save();
-      res.status(201).json({ message: "Color created", newColor });
+      res.status(201).json({ message: "Added a new color.", newColor });
     } catch (error) {
       res.status(500).json({ error });
     }
   },
-   // handle update color
+  // handle update color
   color_update: async (req, res) => {
     const { colorId } = req.params;
     try {
@@ -30,8 +30,9 @@ module.exports = {
           $set: {
             ...req.body,
           },
-        })
-      res.status(200).json({ message: "Updated Color", colorUpdated });
+        }
+      );
+      res.status(200).json({ message: "Color updated.", colorUpdated });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -40,7 +41,7 @@ module.exports = {
     const { colorId } = req.params;
     try {
       await Color.deleteOne({ _id: colorId });
-      res.status(200).json({ message: "Color deleted" });
+      res.status(200).json({ message: "Color deleted." });
     } catch (error) {
       res.status(500).json({ error });
     }

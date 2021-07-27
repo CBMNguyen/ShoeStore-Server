@@ -14,6 +14,7 @@ module.exports = {
       filterEmployees = employees.slice(start, end);
 
       res.status(200).json({
+        message: "Fetch employee successfully.",
         employees: filterEmployees,
         pagination: {
           page,
@@ -37,7 +38,16 @@ module.exports = {
     }
   }, // handle create Employee
   employee_create: async (req, res) => {
-    const { firstname, lastname, gender, birthdate, email, address, phone, position } = req.body;
+    const {
+      firstname,
+      lastname,
+      gender,
+      birthdate,
+      email,
+      address,
+      phone,
+      position,
+    } = req.body;
 
     console.log(req.body);
 
@@ -48,12 +58,12 @@ module.exports = {
 
       if (isEmployee.length >= 1)
         return res.status(409).json({
-          massage: "Mail exists",
+          message: "Mail already exists",
         });
 
       if (isPhoneNumber.length >= 1)
         return res.status(409).json({
-          massage: "Phone number exists",
+          message: "Phone number already exists",
         });
 
       if (!isPosition)
@@ -78,7 +88,9 @@ module.exports = {
         "position"
       );
 
-      res.status(201).json({ message: "Employee Create", employeeCreated });
+      res
+        .status(201)
+        .json({ message: "Added a new employee.", employeeCreated });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -97,13 +109,15 @@ module.exports = {
           },
         }
       );
-      const employeeUpdated = await Employee.findById({ _id: employeeId }).populate("position")
+      const employeeUpdated = await Employee.findById({
+        _id: employeeId,
+      }).populate("position");
       res.status(200).json({ message: "Employee updated", employeeUpdated });
     } catch (error) {
       res.status(500).json({ error });
     }
   }, // handle delete Product
-      // handle delete Employee
+  // handle delete Employee
   employee_delete: async (req, res) => {
     const { employeeId } = req.params;
     try {

@@ -19,6 +19,9 @@ module.exports = {
       address,
     } = req.body;
     console.log(req.body);
+
+    const image = gender === "male" ? "//uploads/avt_male.jpg" : "//uploads/avt_female.jpg"; 
+
     try {
       const user = await User.find({ email });
       const phoneNumber = await User.find({ phone });
@@ -55,11 +58,12 @@ module.exports = {
         email,
         password: hashPassword,
         phone,
+        image,
         address,
         cart: cartId,
       });
       await newUser.save(); // save in database
-      res.status(200).json({ message: "User created", newUser });
+      res.status(200).json({ message: "Sign up successfully.", newUser });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -71,12 +75,12 @@ module.exports = {
     try {
       const user = await User.find({ email });
       if (user.length < 1) {
-        return res.status(401).json({ message: "Auth failed" });
+        return res.status(401).json({ message: "Email does not exist." });
       }
 
       const result = await bcrypt.compare(password, user[0].password);
       if (!result) {
-        return res.status(401).json({ message: "Auth failed" });
+        return res.status(401).json({ message: "Wrong password." });
       }
       // create json web token
       const accessToken = jwt.sign(

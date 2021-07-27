@@ -20,6 +20,7 @@ module.exports = {
       filterProducts = products.slice(start, end);
 
       res.status(200).json({
+        message: "Fetch product successfully.",
         products: filterProducts,
         pagination: {
           page,
@@ -39,7 +40,7 @@ module.exports = {
       else
         res
           .status(404)
-          .json({ message: "No valid entry found for provided Id" });
+          .json({ message: "No valid entry found for provided Id." });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -65,24 +66,15 @@ module.exports = {
 
     try {
       const isCategory = await Category.findById({ _id: category });
-      const isColor = await Color.findById({ _id: color });
-      const isName = await Product.findOne({name});
+      const isName = await Product.findOne({ name });
       if (!isCategory) {
         return res
           .status(404)
-          .json({ message: "No valid entry found for provided CategoryId" });
+          .json({ message: "No valid entry found for provided CategoryId." });
       }
 
-      if (!isColor) {
-        return res
-          .status(404)
-          .json({ message: "No valid entry found for provided ColorId" });
-      }
-
-      if(isName){
-        return res
-          .status(409)
-          .json({ message: "Product exist" });
+      if (isName) {
+        return res.status(409).json({ message: "Product already exists." });
       }
 
       console.log(req.body);
@@ -101,12 +93,13 @@ module.exports = {
         size,
         description,
         quantityStock: parseInt(quantityStock),
-      })
-     let product = await newProduct.save();
-      productCreated = await Product.findById({ _id: product._id }).populate("color", "color")
+      });
+      let product = await newProduct.save();
+      productCreated = await Product.findById({ _id: product._id })
+        .populate("color", "color")
         .populate("category", "name")
         .populate("size", "size");
-      res.status(201).json({ message: "Product created", productCreated });
+      res.status(201).json({ message: "Added a new product.", productCreated });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -120,18 +113,26 @@ module.exports = {
       req.body.images = files;
     }
     try {
-      await Product.updateOne(
-        { _id: productId },
-        {
-          $set: {
-            ...req.body,
-          },
-        }
-      );
-      const productUpdated = await Product.findById({ _id: productId }).populate("color", "color")
-        .populate("category", "name")
-        .populate("size", "size");
-      res.status(200).json({ message: "Product updated", productUpdated });
+      const product = await Product.findById({ _id: productId });
+      const newProduct = await Product.find({ name: req.body.name });
+
+      if (product.name === req.body.name || newProduct.length < 1) {
+        await Product.updateOne(
+          { _id: productId },
+          {
+            $set: {
+              ...req.body,
+            },
+          }
+        );
+        const productUpdated = await Product.findById({ _id: productId })
+          .populate("color", "color")
+          .populate("category", "name")
+          .populate("size", "size");
+        res.status(200).json({ message: "Product updated.", productUpdated });
+      } else {
+        return res.status(409).json({ message: "Product already exist." });
+      }
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -140,7 +141,7 @@ module.exports = {
     const { productId } = req.params;
     try {
       const product = await Product.deleteOne({ _id: productId });
-      res.status(200).json({ message: "Product deleted", product });
+      res.status(200).json({ message: "Product deleted.", product });
     } catch (error) {
       res.status(500).json({ error });
     }

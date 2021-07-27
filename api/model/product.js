@@ -11,7 +11,7 @@ const productSchema = mongoose.Schema(
     isFreeShip: { type: Boolean, default: false },
     promotionPercent: { type: Number, default: 0 },
     images: { type: Array, default: [] },
-    color: { type: mongoose.Schema.Types.ObjectId, ref: "Color" },
+    color: [{ type: mongoose.Schema.Types.ObjectId, ref: "Color" }],
     size: [{ type: mongoose.Schema.Types.ObjectId, ref: "Size" }],
     description: { type: String, required: true },
     quantityStock: { type: Number, min: 0, max: 99, required: true },

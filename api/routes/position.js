@@ -7,7 +7,7 @@ router.get("/", positionController.position_getAll);
 
 router.post("/", positionController.position_create);
 
-router.post("/:positionId", positionController.position_update);
+router.patch("/:positionId", positionController.position_update);
 
 router.delete("/:positionId", positionController.position_delete);
 

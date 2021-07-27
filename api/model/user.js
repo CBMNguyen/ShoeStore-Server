@@ -24,11 +24,10 @@ const userSchema = new mongoose.Schema(
       unique: true,
       match: /^0[0-9]{9}$/,
     },
-    image: { type: String, default: "" },
+    image: { type: String, required: true },
     address: { type: String, required: true },
     cart: { type: mongoose.Schema.Types.ObjectId, ref: "Cart" },
     orderAddress: {
-      fullname: { type: String, default: "" },
       city: { type: String, default: "" },
       district: { type: String, default: "" },
       commune: { type: String, default: "" },
