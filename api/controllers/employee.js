@@ -101,18 +101,36 @@ module.exports = {
       req.body.image = req.file.path;
     }
     try {
-      await Employee.updateOne(
-        { _id: employeeId },
-        {
-          $set: {
-            ...req.body,
-          },
-        }
-      );
-      const employeeUpdated = await Employee.findById({
-        _id: employeeId,
-      }).populate("position");
-      res.status(200).json({ message: "Employee updated", employeeUpdated });
+      const employee = await Employee.findById({ _id: employeeId });
+      const newEmail = await Employee.find({ email: req.body.email });
+      const newPhone = await Employee.find({ phone: req.body.phone });
+
+      if (
+        (employee.email === req.body.email &&
+          employee.phone === req.body.phone) ||
+        (employee.email === req.body.email && newPhone.length < 1) ||
+        (employee.phone === req.body.phone && newEmail.length < 1) ||
+        (newEmail.length < 1 && newPhone.length < 1)
+      ) {
+        await Employee.updateOne(
+          { _id: employeeId },
+          {
+            $set: {
+              ...req.body,
+            },
+          }
+        );
+        const employeeUpdated = await Employee.findById({
+          _id: employeeId,
+        }).populate("position");
+        res.status(200).json({ message: "Employee updated", employeeUpdated });
+      } else {
+        if (employee.phone === req.body.phone && newEmail.length >= 1)
+          return res.status(409).json({ message: "Email already exists." });
+        if (employee.email === req.body.email && newPhone.length >= 1)
+          return res.status(409).json({ message: "Phone already exists." });
+        return res.status(409).json({ message: "Email already exists." });
+      }
     } catch (error) {
       res.status(500).json({ error });
     }
