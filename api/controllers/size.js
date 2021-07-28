@@ -9,10 +9,15 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle create Size
+  }, 
+
+  // handle create Size
   size_create: async (req, res) => {
     const { size } = req.body;
     try {
+      const isCurrentSize = await Size.findOne({size});
+      if(isCurrentSize) return res.status(409).json({message: "Size already exists."});
+
       const newSize = new Size({ size });
       await newSize.save();
       res.status(201).json({ message: "Added a new size.", newSize });
@@ -20,10 +25,16 @@ module.exports = {
       res.status(500).json({ error });
     }
   },
+
+  // handle update size
   size_update: async (req, res) => {
     const { sizeId } = req.params;
     try {
-      const sizeUpdated = await Size.updateOne(
+      const {size} = await Size.findById({_id: sizeId});
+      const isCurrentSize = await Size.findOne({size: req.body.size});
+
+      if(size === req.body.size || !isCurrentSize){
+        const sizeUpdated = await Size.updateOne(
         { _id: sizeId },
         {
           $set: {
@@ -32,10 +43,15 @@ module.exports = {
         }
       );
       res.status(200).json({ message: "Size updated.", sizeUpdated });
-    } catch (error) {
+      }
+     else{
+      res.status(409).json({message: "Size already exists."});
+    }
+  }catch (error) {
       res.status(500).json({ error });
     }
   },
+  
   // handle delete size
   size_delete: async (req, res) => {
     const { sizeId } = req.params;

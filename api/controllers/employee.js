@@ -25,7 +25,9 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle get Employee by Id
+  }, 
+
+  // handle get Employee by Id
   employee_getById: async (req, res) => {
     const { employeeId } = req.params;
     try {
@@ -36,7 +38,9 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle create Employee
+  }, 
+
+  // handle create Employee
   employee_create: async (req, res) => {
     const {
       firstname,
@@ -94,7 +98,9 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle update Employee
+  }, 
+
+  // handle update Employee
   employee_update: async (req, res) => {
     const { employeeId } = req.params;
     if (req.file) {
@@ -102,15 +108,15 @@ module.exports = {
     }
     try {
       const employee = await Employee.findById({ _id: employeeId });
-      const newEmail = await Employee.find({ email: req.body.email });
-      const newPhone = await Employee.find({ phone: req.body.phone });
+      const isCurrentEmail = await Employee.findOne({ email: req.body.email });
+      const isCurrentPhone = await Employee.findOne({ phone: req.body.phone });
 
       if (
         (employee.email === req.body.email &&
           employee.phone === req.body.phone) ||
-        (employee.email === req.body.email && newPhone.length < 1) ||
-        (employee.phone === req.body.phone && newEmail.length < 1) ||
-        (newEmail.length < 1 && newPhone.length < 1)
+        (employee.email === req.body.email && !isCurrentPhone) ||
+        (employee.phone === req.body.phone && !isCurrentEmail) ||
+        (!isCurrentEmail && !isCurrentPhone)
       ) {
         await Employee.updateOne(
           { _id: employeeId },
@@ -125,16 +131,17 @@ module.exports = {
         }).populate("position");
         res.status(200).json({ message: "Employee updated", employeeUpdated });
       } else {
-        if (employee.phone === req.body.phone && newEmail.length >= 1)
+        if (employee.phone === req.body.phone && isCurrentEmail)
           return res.status(409).json({ message: "Email already exists." });
-        if (employee.email === req.body.email && newPhone.length >= 1)
+        if (employee.email === req.body.email && isCurrentPhone)
           return res.status(409).json({ message: "Phone already exists." });
         return res.status(409).json({ message: "Email already exists." });
       }
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle delete Product
+  }, 
+  
   // handle delete Employee
   employee_delete: async (req, res) => {
     const { employeeId } = req.params;

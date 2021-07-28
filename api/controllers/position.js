@@ -11,30 +11,43 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle create Position
+  }, 
+
+  // handle create Position
   position_create: async (req, res) => {
     const { position, salary } = req.body;
     try {
+      const isCurrentPosition = await Position.findOne({position});
+      if(isCurrentPosition) return res.status(409).json({message: "Positions already exists."});
+
       const newPosition = new Position({ position, salary });
       await newPosition.save();
       res.status(201).json({ message: "Added a new position.", newPosition });
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle update position
+  }, 
+
+  // handle update position
   position_update: async (req, res) => {
     const { positionId } = req.params;
-    req.body.salary = parseInt(req.body.salary);
     try {
-      const positionUpdated = await Position.updateOne(
-        { _id: positionId },
-        {
-          $set: {
-            ...req.body,
-          },
-        }
-      );
+      const {position} = await Position.findById({_id: positionId});
+      const isCurrentPosition = await Position.findOne({position: req.body.position});
+
+      if(position === req.body.position || !isCurrentPosition){
+        const positionUpdated = await Position.updateOne(
+          { _id: positionId },
+          {
+            $set: {
+              ...req.body,
+            },
+          }
+        );
       res.status(200).json({ message: "Position updated.", positionUpdated });
+      }else{
+        res.status(409).json({message: "Positions already exists."});
+      }
     } catch (error) {
       res.status(500).json({ error });
     }

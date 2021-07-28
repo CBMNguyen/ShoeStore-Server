@@ -11,10 +11,15 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, //handle create category
+  }, 
+
+  //handle create category
   category_create: async (req, res) => {
     const { name } = req.body;
     try {
+      const isCurrentName = await Category.findOne({name});
+      if(isCurrentName) return res.status(409).json({message: "Category already exists."});
+
       const newCategory = new Category({ name });
       await newCategory.save();
       res.status(200).json({ message: "Added a new category.", newCategory });
@@ -22,19 +27,27 @@ module.exports = {
       res.status(500).json({ error });
     }
   },
+
   // handle update category
   category_update: async (req, res) => {
     const { categoryId } = req.params;
     try {
-      const categoryUpdated = await Category.updateOne(
-        { _id: categoryId },
-        {
-          $set: {
-            ...req.body,
-          },
-        }
-      );
-      res.status(200).json({ message: "Category updated", categoryUpdated });
+      const category = await Category.findById({_id: categoryId});
+      const isCurrentName = await Category.findOne({name: req.body.name});
+
+      if(category.name === req.body.name || !isCurrentName){
+          const categoryUpdated = await Category.updateOne(
+          { _id: categoryId },
+          {
+            $set: {
+              ...req.body,
+            },
+          }
+        );
+        res.status(200).json({ message: "Category updated.", categoryUpdated });
+      }else{
+        res.status(409).json({message: "Category already exists."});
+      }
     } catch (error) {
       res.status(500).json({ error });
     }

@@ -8,9 +8,10 @@ module.exports = {
   product_getAll: async (req, res) => {
     try {
       const products = await Product.find()
-        .populate("color", "color")
-        .populate("category", "name")
-        .populate("size", "size");
+        .populate("color")
+        .populate("category")
+        .populate("size");
+
       const page = req.query.page || 1;
       const limit = req.query.limit || products.length;
 
@@ -31,7 +32,9 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle get product by Id
+  }, 
+
+  // handle get product by Id
   product_getById: async (req, res) => {
     const { productId } = req.params;
     try {
@@ -44,7 +47,9 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle create Product
+  }, 
+
+  // handle create Product
   product_create: async (req, res) => {
     const {
       category,
@@ -66,14 +71,14 @@ module.exports = {
 
     try {
       const isCategory = await Category.findById({ _id: category });
-      const isName = await Product.findOne({ name });
+      const isCurrentName = await Product.findOne({ name });
       if (!isCategory) {
         return res
           .status(404)
           .json({ message: "No valid entry found for provided CategoryId." });
       }
 
-      if (isName) {
+      if (isCurrentName) {
         return res.status(409).json({ message: "Product already exists." });
       }
 
@@ -96,14 +101,16 @@ module.exports = {
       });
       let product = await newProduct.save();
       productCreated = await Product.findById({ _id: product._id })
-        .populate("color", "color")
-        .populate("category", "name")
-        .populate("size", "size");
+        .populate("color")
+        .populate("category")
+        .populate("size");
       res.status(201).json({ message: "Added a new product.", productCreated });
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle update Product
+  }, 
+
+  // handle update Product
   product_update: async (req, res) => {
     const { productId } = req.params;
     if (req.files) {
@@ -113,10 +120,10 @@ module.exports = {
       req.body.images = files;
     }
     try {
-      const product = await Product.findById({ _id: productId });
-      const newProduct = await Product.find({ name: req.body.name });
+      const {name} = await Product.findById({ _id: productId });
+      const isCurrentProduct = await Product.findOne({ name: req.body.name });
 
-      if (product.name === req.body.name || newProduct.length < 1) {
+      if (name === req.body.name || !isCurrentProduct) {
         await Product.updateOne(
           { _id: productId },
           {
@@ -126,9 +133,9 @@ module.exports = {
           }
         );
         const productUpdated = await Product.findById({ _id: productId })
-          .populate("color", "color")
-          .populate("category", "name")
-          .populate("size", "size");
+          .populate("color")
+          .populate("category")
+          .populate("size");
         res.status(200).json({ message: "Product updated.", productUpdated });
       } else {
         return res.status(409).json({ message: "Product already exist." });
@@ -136,7 +143,9 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, // handle delete Product
+  }, 
+
+  // handle delete Product
   product_delete: async (req, res) => {
     const { productId } = req.params;
     try {

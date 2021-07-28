@@ -27,13 +27,13 @@ module.exports = {
       const phoneNumber = await User.find({ phone });
       if (user.length >= 1) {
         return res.status(409).json({
-          massage: "Mail exists",
+          massage: "Mail already exists",
         });
       }
 
       if (phoneNumber.length >= 1) {
         return res.status(409).json({
-          massage: "Phone exists",
+          massage: "Phone already exists",
         });
       }
 
@@ -151,7 +151,7 @@ module.exports = {
         { _id: userId },
         { $set: { ...req.body } }
       );
-      res.status(200).json({ message: "Updated", user });
+      res.status(200).json({ message: "Update information successfully.", user });
     } catch (error) {
       res.status(500).json({ error });
     }
