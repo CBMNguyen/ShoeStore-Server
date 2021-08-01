@@ -18,9 +18,10 @@ module.exports = {
       phone,
       address,
     } = req.body;
+
     console.log(req.body);
 
-    const image = gender === "male" ? "//uploads/avt_male.jpg" : "//uploads/avt_female.jpg"; 
+    const image = gender === "male" ? "uploads/avt_male.jpg" : "uploads/avt_female.jpg"; 
 
     try {
       const user = await User.find({ email });
@@ -63,7 +64,7 @@ module.exports = {
         cart: cartId,
       });
       await newUser.save(); // save in database
-      res.status(200).json({ message: "Sign up successfully.", newUser });
+      res.status(200).json({ message: "Sign up successfully."});
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -117,7 +118,10 @@ module.exports = {
   user_getAll: async (req, res, next) => {
     try {
       const users = await User.find().populate("cart");
-      res.status(200).json({ users });
+
+      res.status(200).json({ message: "Fetch users successfully.", 
+        users
+      });
     } catch (error) {
       res.status(500).json({ error });
     }

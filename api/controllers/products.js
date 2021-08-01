@@ -12,22 +12,9 @@ module.exports = {
         .populate("category")
         .populate("size");
 
-      const page = req.query.page || 1;
-      const limit = req.query.limit || products.length;
-
-      const start = (page - 1) * limit;
-      const end = page * limit;
-
-      filterProducts = products.slice(start, end);
-
       res.status(200).json({
         message: "Fetch product successfully.",
-        products: filterProducts,
-        pagination: {
-          page,
-          limit,
-          totalRow: products.length,
-        },
+        products,
       });
     } catch (error) {
       res.status(500).json({ error });
@@ -62,6 +49,7 @@ module.exports = {
       description,
       quantityStock,
     } = req.body;
+
     if (req.files) {
       const files = req.files.map((file) => {
         return file.path;
@@ -87,7 +75,7 @@ module.exports = {
       const newProduct = new Product({
         category,
         name,
-        originalPrice: parseInt(originalPrice),
+        originalPrice: parseFloat(originalPrice),
         promotionPercent: parseInt(promotionPercent),
         salePrice: Math.ceil(
           originalPrice * (1 - parseInt(promotionPercent) / 100)
@@ -99,15 +87,16 @@ module.exports = {
         description,
         quantityStock: parseInt(quantityStock),
       });
-      let product = await newProduct.save();
-      productCreated = await Product.findById({ _id: product._id })
-        .populate("color")
-        .populate("category")
-        .populate("size");
-      res.status(201).json({ message: "Added a new product.", productCreated });
-    } catch (error) {
-      res.status(500).json({ error });
-    }
+
+     let product = await newProduct.save();
+     productCreated = await Product.findById({ _id: product._id })
+      .populate("color")
+      .populate("category")
+      .populate("size");
+     res.status(201).json({ message: "Added a new product.", productCreated });
+     } catch (error) {
+       res.status(500).json({ error });
+     }
   }, 
 
   // handle update Product

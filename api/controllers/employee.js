@@ -1,27 +1,64 @@
 const Employee = require("../model/employee");
 const Position = require("../model/position");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
 module.exports = {
   // handle get all Employee
   employee_getAll: async (req, res) => {
     try {
       const employees = await Employee.find().populate("position");
-      const page = req.query.page || 1;
-      const limit = req.query.limit || employees.length;
-
-      const start = (page - 1) * limit;
-      const end = page * limit;
-
-      filterEmployees = employees.slice(start, end);
 
       res.status(200).json({
         message: "Fetch employee successfully.",
-        employees: filterEmployees,
-        pagination: {
-          page,
-          limit,
-          totalRow: employees.length,
-        },
+        employees,
       });
+    } catch (error) {
+      res.status(500).json({ error });
+    }
+  },
+
+  employee_login: async (req, res, next) => {
+    const { email, password } = req.body;
+    try {
+      const employee = await Employee.find({ email });
+      if (employee.length < 1) {
+        return res.status(401).json({ message: "Email does not exist." });
+      }
+
+      const result = await bcrypt.compare(password, process.env.EMPLOYEE_PW);
+
+      if (!result) {
+        return res.status(401).json({ message: "Wrong password." });
+      }
+      // create json web token
+      const accessToken = jwt.sign(
+        {
+          employeeId: employee[0]._id,
+          firstname: employee[0].firstname,
+          lastname: employee[0].lastname,
+          imageUrl: employee[0].image
+        },
+        process.env.JWT_KEY,
+        {
+          expiresIn: "1d",
+        }
+      );
+      const refreshToken = jwt.sign(
+        {
+          employeeId: employee[0]._id,
+          firstname: employee[0].firstname,
+          lastname: employee[0].lastname,
+          imageUrl: employee[0].image
+        },
+        process.env.JWT_KEY,
+        {
+          expiresIn: "7d",
+        }
+      );
+      res
+        .status(200)
+        .json({ message: "Auth successful", accessToken, refreshToken });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -86,15 +123,13 @@ module.exports = {
         image: req.file.path,
         position,
       });
+
       const employee = await newEmployee.save();
-
-      employeeCreated = await Employee.findById({ _id: employee._id }).populate(
-        "position"
-      );
-
-      res
-        .status(201)
-        .json({ message: "Added a new employee.", employeeCreated });
+      
+      const employeeCreated = await Employee.findById({
+          _id: employee._id,
+        }).populate("position");
+      res.status(200).json({ message: "Employee created", employeeCreated });
     } catch (error) {
       res.status(500).json({ error });
     }

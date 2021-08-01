@@ -1,14 +1,15 @@
 const express = require("express");
 const router = express.Router();
+const checkAuth = require("../midlewares/check-auth.js");
 
 const sizeController = require("../controllers/size");
 
 router.get("/", sizeController.size_getAll);
 
-router.post("/", sizeController.size_create);
+router.post("/", checkAuth, sizeController.size_create);
 
-router.patch("/:sizeId", sizeController.size_update);
+router.patch("/:sizeId", checkAuth, sizeController.size_update);
 
-router.delete("/:sizeId", sizeController.size_delete);
+router.delete("/:sizeId", checkAuth, sizeController.size_delete);
 
 module.exports = router;

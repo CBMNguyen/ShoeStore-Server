@@ -1,14 +1,15 @@
 const express = require("express");
+const checkAuth = require("../midlewares/check-auth.js");
 const router = express.Router();
 
 const colorController = require("../controllers/color");
 
 router.get("/", colorController.color_getAll);
 
-router.post("/", colorController.color_create);
+router.post("/",checkAuth, colorController.color_create);
 
-router.patch("/:colorId", colorController.color_update);
+router.patch("/:colorId", checkAuth, colorController.color_update);
 
-router.delete("/:colorId", colorController.color_delete);
+router.delete("/:colorId",checkAuth, colorController.color_delete);
 
 module.exports = router;
