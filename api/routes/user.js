@@ -14,7 +14,7 @@ router.get("/", checkAuth, userController.user_getAll);
 
 router.get("/:userId", userController.user_get);
 
-router.patch("/:userId", upload.single("image"), checkUser, userController.user_update);
+router.patch("/:userId", checkUser, upload.single("image"), userController.user_update);
 
 router.delete("/:userId", checkAuth,userController.user_delete);
 

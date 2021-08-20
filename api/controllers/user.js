@@ -135,25 +135,34 @@ module.exports = {
   // handle update user by Id
   user_update: async (req, res, next) => {
     const { userId } = req.params;
-    const {firstname, lastname, email, password, phone, gender, image, address} = req.body;
+    const {firstname, lastname, email, password, phone, gender, image, address, orderAddress} = req.body;
     if(req.file)
       req.body.image = req.file.path;
 
     try {
       let user = null; 
-      if (req.body.password !== '') {
-        console.log("have passwprd-----------------");
+      if (req.body.password) {
+        console.log("have password-----------------");
         req.body.password = await bcrypt.hash(req.body.password, 10); // hash password by brycpt
+
          user = await User.updateOne(
           { _id: userId },
           { $set: { ...req.body } }
         );
+
       }else{
-          console.log("empty passwprd-----------------");
-          user = await User.updateOne(
-          { _id: userId },
-          { $set: { firstname, lastname, email, phone, gender, image: req.body.image, address }}
-            );
+          console.log("empty password-----------------");
+          if(orderAddress){
+              user = await User.updateOne(
+            { _id: userId },
+            { $set: { orderAddress }}
+              );
+          }else{
+             user = await User.updateOne(
+              { _id: userId },
+              { $set: { firstname, lastname, email, phone, gender, image: req.body.image, address }}
+                );
+          }
           }
       let userUpdated = await User.findOne({_id: userId});
       console.log(userUpdated.password);
