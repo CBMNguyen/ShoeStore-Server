@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const upload = require("../utils/common");
 const checkAuth = require("../midlewares/check-auth.js");
+const checkUser = require("../midlewares/check-user.js");
 
 const userController = require("../controllers/user");
 
@@ -9,11 +10,11 @@ router.post("/signup", userController.user_signup);
 
 router.post("/login", userController.user_login);
 
-router.get("/", userController.user_getAll);
+router.get("/", checkAuth, userController.user_getAll);
 
 router.get("/:userId", userController.user_get);
 
-router.patch("/:userId",checkAuth, upload.single("image"), userController.user_update);
+router.patch("/:userId", upload.single("image"), checkUser, userController.user_update);
 
 router.delete("/:userId", checkAuth,userController.user_delete);
 

@@ -11,7 +11,7 @@ router.get("/:productId", productController.product_getById);
 
 router.post("/",checkAuth, upload.array("images", 12), productController.product_create);
 
-router.patch("/:productId", checkAuth, upload.array("images", 12), productController.product_update);
+router.patch("/:productId", upload.array("images", 12), productController.product_update);
 
 router.delete("/:productId", checkAuth, productController.product_delete);
 

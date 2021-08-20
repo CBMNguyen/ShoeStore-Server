@@ -20,7 +20,7 @@ const employeeSchema = new mongoose.Schema(
       unique: true,
       match: /^0[0-9]{9}$/,
     },
-    image: { type: String, default: "" },
+    image: { type: String, default: "uploads/avt_male.jpg" },
     position: { type: mongoose.Schema.Types.ObjectId, ref: "Position" },
   },
   {

@@ -37,6 +37,7 @@ module.exports = {
           employeeId: employee[0]._id,
           firstname: employee[0].firstname,
           lastname: employee[0].lastname,
+          position: employee[0].position,
           imageUrl: employee[0].image
         },
         process.env.JWT_KEY,

@@ -5,7 +5,6 @@ const userSchema = new mongoose.Schema(
     firstname: { type: String, required: true },
     lastname: { type: String, required: true },
     gender: { type: String, required: true },
-    birthdate: { type: Date, required: true },
     email: {
       type: String,
       required: true,
@@ -26,8 +25,10 @@ const userSchema = new mongoose.Schema(
     },
     image: { type: String, required: true },
     address: { type: String, required: true },
-    cart: { type: mongoose.Schema.Types.ObjectId, ref: "Cart" },
     orderAddress: {
+      fullName: {type: String, default: ""},
+      isFullDay: {type: Boolean, default: true},
+      phone: { type: String, default: "" },
       city: { type: String, default: "" },
       district: { type: String, default: "" },
       commune: { type: String, default: "" },

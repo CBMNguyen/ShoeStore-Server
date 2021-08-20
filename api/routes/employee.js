@@ -7,9 +7,9 @@ const employeeController = require("../controllers/employee");
 
 router.post("/login", employeeController.employee_login);
 
-router.get("/", employeeController.employee_getAll);
+router.get("/",checkAuth, employeeController.employee_getAll);
 
-router.get("/:employeeId", employeeController.employee_getById);
+router.get("/:employeeId", checkAuth, employeeController.employee_getById);
 
 router.post("/", checkAuth, upload.single("image"), employeeController.employee_create);
 

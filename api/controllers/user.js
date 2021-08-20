@@ -2,7 +2,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../model/user");
-const Cart = require("../model/cart");
 const mongoose = require("mongoose");
 
 module.exports = {
@@ -12,7 +11,6 @@ module.exports = {
       firstname,
       lastname,
       gender,
-      birthdate,
       email,
       password,
       phone,
@@ -28,40 +26,27 @@ module.exports = {
       const phoneNumber = await User.find({ phone });
       if (user.length >= 1) {
         return res.status(409).json({
-          massage: "Mail already exists",
+          message: "Mail already exists",
         });
       }
 
       if (phoneNumber.length >= 1) {
         return res.status(409).json({
-          massage: "Phone already exists",
+          message: "Phone already exists",
         });
       }
-
-      const cartId = new mongoose.Types.ObjectId();
-      const userId = new mongoose.Types.ObjectId();
-
-      const cart = new Cart({
-        _id: cartId,
-        user: userId,
-      });
-
-      await cart.save();
 
       const hashPassword = await bcrypt.hash(password, 10);
       const newUser = new User({
         // create new user
-        _id: userId,
         firstname,
         lastname,
         gender,
-        birthdate,
         email,
         password: hashPassword,
         phone,
         image,
         address,
-        cart: cartId,
       });
       await newUser.save(); // save in database
       res.status(200).json({ message: "Sign up successfully."});
@@ -71,9 +56,12 @@ module.exports = {
   },
 
   // handle post login
+
   user_login: async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, token } = req.body;
     try {
+     // handle token with email password
+
       const user = await User.find({ email });
       if (user.length < 1) {
         return res.status(401).json({ message: "Email does not exist." });
@@ -92,7 +80,7 @@ module.exports = {
         },
         process.env.JWT_KEY,
         {
-          expiresIn: "1h",
+          expiresIn: "1d",
         }
       );
       const refreshToken = jwt.sign(
@@ -108,7 +96,7 @@ module.exports = {
       );
       res
         .status(200)
-        .json({ massage: "Auth successful", accessToken, refreshToken });
+        .json({ message: "Login successful", accessToken, refreshToken });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -131,12 +119,14 @@ module.exports = {
   user_get: async (req, res, next) => {
     const { userId } = req.params;
     try {
-      const user = await User.findById({ _id: userId }).populate("cart");
+      let user = await User.findById({ _id: userId });
+      console.log(user.password);
+      user.password = null;
       if (user) res.status(200).json({ user });
       else
         res
           .status(404)
-          .json({ message: "No valid entry found for provided Id" });
+          .json({ message: "User Id does not exists." });
     } catch (error) {
       res.status(500).json({ error });
     }
@@ -145,19 +135,34 @@ module.exports = {
   // handle update user by Id
   user_update: async (req, res, next) => {
     const { userId } = req.params;
-    req.body.image = req.file.path;
+    const {firstname, lastname, email, password, phone, gender, image, address} = req.body;
+    if(req.file)
+      req.body.image = req.file.path;
 
     try {
-      if (req.body.password) {
+      let user = null; 
+      if (req.body.password !== '') {
+        console.log("have passwprd-----------------");
         req.body.password = await bcrypt.hash(req.body.password, 10); // hash password by brycpt
-      }
-      const user = await User.updateOne(
-        { _id: userId },
-        { $set: { ...req.body } }
-      );
-      res.status(200).json({ message: "Update information successfully.", user });
+         user = await User.updateOne(
+          { _id: userId },
+          { $set: { ...req.body } }
+        );
+      }else{
+          console.log("empty passwprd-----------------");
+          user = await User.updateOne(
+          { _id: userId },
+          { $set: { firstname, lastname, email, phone, gender, image: req.body.image, address }}
+            );
+          }
+      let userUpdated = await User.findOne({_id: userId});
+      console.log(userUpdated.password);
+      userUpdated.password = null;
+
+      res.status(200).json({ message: "Update successfully.", userUpdated });
     } catch (error) {
       res.status(500).json({ error });
+      console.error(error);
     }
   },
 
