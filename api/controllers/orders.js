@@ -21,7 +21,7 @@ module.exports = {
       const order = await Order.find({ user: userId }).populate("user", "_id");
       console.log(order);
       if (order.length !== 0) 
-        res.status(200).json({ message: "Fetch order successfully.", order: order[order.length - 1]});
+        res.status(200).json({ message: "Fetch order successfully.", order});
       else
         res.status(404).json({ message: "Order by user id is empty." });
     } catch (error) {

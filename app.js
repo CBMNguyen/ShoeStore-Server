@@ -41,6 +41,7 @@ app.use("/size", sizeRoute);
 app.use("/position", positionRoute);
 app.use("/products", productRoute);
 
+// Test and throw new error
 app.use((req, res, next) => {
   const error = new Error("Not Found");
   error.status = 404;

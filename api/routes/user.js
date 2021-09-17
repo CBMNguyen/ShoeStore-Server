@@ -14,8 +14,13 @@ router.get("/", checkAuth, userController.user_getAll);
 
 router.get("/:userId", userController.user_get);
 
-router.patch("/:userId", checkUser, upload.single("image"), userController.user_update);
+router.patch(
+  "/:userId",
+  checkUser,
+  upload.single("image"),
+  userController.user_update
+);
 
-router.delete("/:userId", checkAuth,userController.user_delete);
+router.delete("/:userId", checkAuth, userController.user_delete);
 
 module.exports = router;
