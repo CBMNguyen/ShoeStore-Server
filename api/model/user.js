@@ -4,7 +4,8 @@ const userSchema = new mongoose.Schema(
   {
     firstname: { type: String, required: true },
     lastname: { type: String, required: true },
-    gender: { type: String, required: true },
+    gender: String,
+    birthdate: { type: Date, required: true },
     email: {
       type: String,
       required: true,
@@ -19,15 +20,14 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: true,
-      unique: true,
-      match: /^0[0-9]{9}$/,
+      // required: true,
+      // match: /^0[0-9]{9}$/,
     },
     image: { type: String, required: true },
-    address: { type: String, required: true },
+    address: String,
     orderAddress: {
-      fullName: {type: String, default: ""},
-      isFullDay: {type: Boolean, default: true},
+      fullName: { type: String, default: "" },
+      isFullDay: { type: Boolean, default: true },
       phone: { type: String, default: "" },
       city: { type: String, default: "" },
       district: { type: String, default: "" },

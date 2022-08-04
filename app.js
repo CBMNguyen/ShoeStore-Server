@@ -5,6 +5,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 require("dotenv").config();
+const fs = require("fs");
 
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useFindAndModify", false);
@@ -12,14 +13,14 @@ mongoose.set("useCreateIndex", true);
 
 mongoose.connect(
   // connect mongodb atlas
-  `mongodb+srv://CBMNguyen:${process.env.MONGO_ATLAS_PW}@cluster0.9ctcl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
+  `mongodb+srv://hieunguyen:${process.env.MONGO_ATLAS_PW}@cluster0.9ctcl.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`,
   { useUnifiedTopology: true },
-  () => console.log(" Mongoose is connected")
+  (error) => {
+    error ? console.log(error) : console.log(" Mongoose is connected");
+  }
 );
 
 app.use(morgan("dev"));
-app.use("/uploads", express.static("uploads"));
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -56,4 +57,5 @@ app.use((error, req, res, next) => {
     },
   });
 });
+
 module.exports = app;
