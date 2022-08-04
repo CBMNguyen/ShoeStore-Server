@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../utils/common");
+const upload = require("../utils/upload");
 const checkAuth = require("../midlewares/check-auth.js");
 const checkUser = require("../midlewares/check-user.js");
 
@@ -10,9 +10,14 @@ router.get("/", productController.product_getAll);
 
 router.get("/:productId", productController.product_getById);
 
-router.post("/",checkAuth, upload.array("images", 12), productController.product_create);
+router.post("/", upload.array("images", 12), productController.product_create);
 
-router.patch("/:productId", checkUser, upload.array("images", 12), productController.product_update);
+router.patch(
+  "/:productId",
+  checkUser,
+  upload.array("images", 12),
+  productController.product_update
+);
 
 router.delete("/:productId", checkAuth, productController.product_delete);
 
