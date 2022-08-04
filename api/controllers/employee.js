@@ -2,6 +2,8 @@ const Employee = require("../model/employee");
 const Position = require("../model/position");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const GENDER_IMAGE = require("../utils/common");
+const cloudinary = require("../utils/cloudinary.config");
 
 module.exports = {
   // handle get all Employee
@@ -38,32 +40,18 @@ module.exports = {
           firstname: employee[0].firstname,
           lastname: employee[0].lastname,
           position: employee[0].position,
-          imageUrl: employee[0].image
+          imageUrl: employee[0].image,
         },
         process.env.JWT_KEY,
         {
           expiresIn: "1d",
         }
       );
-      const refreshToken = jwt.sign(
-        {
-          employeeId: employee[0]._id,
-          firstname: employee[0].firstname,
-          lastname: employee[0].lastname,
-          imageUrl: employee[0].image
-        },
-        process.env.JWT_KEY,
-        {
-          expiresIn: "7d",
-        }
-      );
-      res
-        .status(200)
-        .json({ message: "Auth successful", accessToken, refreshToken });
+      res.status(200).json({ message: "Auth successful", accessToken });
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, 
+  },
 
   // handle get Employee by Id
   employee_getById: async (req, res) => {
@@ -76,7 +64,7 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, 
+  },
 
   // handle create Employee
   employee_create: async (req, res) => {
@@ -91,7 +79,16 @@ module.exports = {
       position,
     } = req.body;
 
-    console.log(req.body);
+    req.body.image =
+      gender === "male" ? GENDER_IMAGE.male : GENDER_IMAGE.female;
+
+    if (req.file) {
+      // Upload to cloud
+      req.body.image = await cloudinary.upload(
+        req.file.path,
+        process.env.CLOUD_FOLDER_UPLOAD
+      );
+    }
 
     try {
       const isPosition = await Position.findById({ _id: position });
@@ -121,27 +118,33 @@ module.exports = {
         email,
         address,
         phone,
-        image: req.file.path,
+        image: req.body.image,
         position,
       });
 
       const employee = await newEmployee.save();
-      
+
       const employeeCreated = await Employee.findById({
-          _id: employee._id,
-        }).populate("position");
+        _id: employee._id,
+      }).populate("position");
       res.status(200).json({ message: "Employee created", employeeCreated });
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, 
+  },
 
   // handle update Employee
   employee_update: async (req, res) => {
     const { employeeId } = req.params;
+
     if (req.file) {
-      req.body.image = req.file.path;
+      // Upload to cloud
+      req.body.image = await cloudinary.upload(
+        req.file.path,
+        process.env.CLOUD_FOLDER_UPLOAD
+      );
     }
+
     try {
       const employee = await Employee.findById({ _id: employeeId });
       const isCurrentEmail = await Employee.findOne({ email: req.body.email });
@@ -176,8 +179,8 @@ module.exports = {
     } catch (error) {
       res.status(500).json({ error });
     }
-  }, 
-  
+  },
+
   // handle delete Employee
   employee_delete: async (req, res) => {
     const { employeeId } = req.params;

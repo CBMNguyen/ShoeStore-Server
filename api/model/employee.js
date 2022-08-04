@@ -20,7 +20,11 @@ const employeeSchema = new mongoose.Schema(
       unique: true,
       match: /^0[0-9]{9}$/,
     },
-    image: { type: String, default: "uploads/avt_male.jpg" },
+    image: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/h2kcloud/image/upload/v1659461324/ShoesStore/avt_male_idrt86.jpg",
+    },
     position: { type: mongoose.Schema.Types.ObjectId, ref: "Position" },
   },
   {
