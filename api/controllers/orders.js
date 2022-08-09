@@ -1,4 +1,6 @@
 const Order = require("../model/order");
+const Product = require("../model/product");
+const checkout = require("../utils/checkout");
 
 module.exports = {
   // handle get all Order
@@ -19,11 +21,9 @@ module.exports = {
     const { userId } = req.params;
     try {
       const order = await Order.find({ user: userId }).populate("user", "_id");
-      console.log(order);
-      if (order.length !== 0) 
-        res.status(200).json({ message: "Fetch order successfully.", order});
-      else
-        res.status(404).json({ message: "Order by user id is empty." });
+      if (order.length !== 0)
+        res.status(200).json({ message: "Fetch order successfully.", order });
+      else res.status(404).json({ message: "Order by user id is empty." });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error });
@@ -32,10 +32,30 @@ module.exports = {
 
   // handle create order
   order_create: async (req, res) => {
-    const  data  = req.body;
-    console.log(req.body);
+    const data = req.body;
     try {
-      const newOrder = new Order(data );
+      data.products.forEach(async (item) => {
+        await Product.updateOne(
+          { _id: item._id },
+          {
+            $set: {
+              productDetail: item.productDetail.map((item) => {
+                return {
+                  images: item.images,
+                  color: item.color._id,
+                  sizeAndQuantity: item.sizeAndQuantity.map((s) => ({
+                    quantity: s.quantity,
+                    size: s.size._id,
+                  })),
+                };
+              }),
+              quantityStock: item.quantityStock,
+            },
+          }
+        );
+      });
+
+      const newOrder = new Order(data);
       await newOrder.save();
       res.status(201).json({ message: "Check out successfully.", newOrder });
     } catch (error) {
@@ -46,10 +66,10 @@ module.exports = {
   order_update: async (req, res) => {
     const { orderId } = req.params;
     try {
-      const order = await Order.findById({_id: orderId});
-      if(!order)
-        return res.status(404).json({ message: "Order is not exists."});
-      
+      const order = await Order.findById({ _id: orderId });
+      if (!order)
+        return res.status(404).json({ message: "Order is not exists." });
+
       const orderUpdated = await Order.updateOne(
         { _id: orderId },
         {
@@ -59,7 +79,7 @@ module.exports = {
         }
       );
       res.status(200).json({ message: "Order Updated.", orderUpdated });
-  }catch (error) {
+    } catch (error) {
       res.status(500).json({ error });
     }
   },
@@ -67,9 +87,36 @@ module.exports = {
   order_delete: async (req, res) => {
     const { orderId } = req.params;
     try {
+      const { products: order } = await Order.findOne({ _id: orderId });
+      const cloneOrder = order.slice().map((item) => ({ ...item }));
+
+      const products = checkout(cloneOrder, order);
+
+      products.forEach(async (item) => {
+        await Product.updateOne(
+          { _id: item._id },
+          {
+            $set: {
+              productDetail: item.productDetail.map((item) => {
+                return {
+                  images: item.images,
+                  color: item.color._id,
+                  sizeAndQuantity: item.sizeAndQuantity.map((s) => ({
+                    quantity: s.quantity,
+                    size: s.size._id,
+                  })),
+                };
+              }),
+              quantityStock: item.quantityStock,
+            },
+          }
+        );
+      });
+
       await Order.deleteOne({ _id: orderId });
-      res.status(200).json({ message: "order deleted." });
+      res.status(200).json({ message: "Order cancel successfully." });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error });
     }
   },

@@ -29,6 +29,7 @@ const employeeSchema = new mongoose.Schema(
   },
   {
     versionKey: false,
+    timestamps: true,
   }
 );
 

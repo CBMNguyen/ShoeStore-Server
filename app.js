@@ -32,6 +32,7 @@ const orderRoute = require("./api/routes/orders");
 const sizeRoute = require("./api/routes/size");
 const positionRoute = require("./api/routes/position");
 const productRoute = require("./api/routes/products");
+const pavementRoute = require("./api/routes/pavement");
 
 app.use("/user", userRoute);
 app.use("/employee", employeeRoute);
@@ -41,6 +42,7 @@ app.use("/order", orderRoute);
 app.use("/size", sizeRoute);
 app.use("/position", positionRoute);
 app.use("/products", productRoute);
+app.use("/pavement", pavementRoute);
 
 // Test and throw new error
 app.use((req, res, next) => {

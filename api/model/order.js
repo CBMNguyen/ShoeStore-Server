@@ -4,11 +4,12 @@ const orderSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     products: { type: Array, require: true },
-    createdAt: { type: Date, default: Date.now },
-    state: {type: String, default: "pending"}
+    state: { type: String, default: "pending" },
+    total: { type: Number, require: true },
   },
   {
     versionKey: false,
+    timestamps: true,
   }
 );
 
