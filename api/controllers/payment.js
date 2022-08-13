@@ -1,32 +1,32 @@
 module.exports = {
-  pavement: (request, response) => {
+  payment: (request, response) => {
     //parameters
-    var accessKey = process.env.ACCESSKEY;
-    var secretKey = process.env.SECRETKEY;
-    var orderInfo = process.env.ORDER_INFO;
-    var partnerCode = process.env.PARTNERCODE;
-    var redirectUrl = process.env.REDIRECTURL;
-    var ipnUrl = process.env.IPNURL;
-    var requestType = "payWithMethod";
-    var amount = response.body.amount;
-    var orderId = response.body.orderId;
-    var requestId = orderId;
-    var extraData = "";
-    var paymentCode = process.env.PAYMENTCODE;
-    var orderGroupId = "";
-    var autoCapture = true;
-    var lang = "vi";
+    const accessKey = process.env.ACCESSKEY;
+    const secretKey = process.env.SECRETKEY;
+    const orderInfo = process.env.ORDER_INFO;
+    const partnerCode = process.env.PARTNERCODE;
+    const redirectUrl = process.env.REDIRECTURL;
+    const ipnUrl = process.env.IPNURL;
+    const requestType = "payWithMethod";
+    const amount = request.body.total;
+    const orderId = request.body._id;
+    const requestId = orderId;
+    const extraData = "";
+    const paymentCode = process.env.PAYMENTCODE;
+    const orderGroupId = "";
+    const autoCapture = true;
+    const lang = "vi";
 
     //before sign HMAC SHA256 with format
     //accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType
-    var rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData +
+    const rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData +
       "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" +
       partnerCode + "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" +
       requestType;
-
+    
     //signature
     const crypto = require("crypto");
-    var signature = crypto
+    const signature = crypto
       .createHmac("sha256", secretKey)
       .update(rawSignature)
       .digest("hex");
@@ -64,7 +64,8 @@ module.exports = {
     //Send the request and get the response
     const req = https.request(options, (res) => {
       res.setEncoding("utf8");
-      res.on("data", ({shortLink}) => {
+      res.on("data", (data) => {
+        const {shortLink} = JSON.parse(data);
         response.status(200).json({shortLink});
       });
       res.on("end", () => {
@@ -73,7 +74,7 @@ module.exports = {
     });
 
     req.on("error", (e) => {
-      console.log(`problem with request: ${e.message}`);
+      response.status(500).json({message: `problem with request: ${e.message}`})
     });
     req.write(requestBody);
     req.end();
