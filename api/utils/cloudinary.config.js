@@ -15,7 +15,7 @@ module.exports.upload = (path, folder) => {
       path,
       {
         folder,
-        allowed_formats: ["png", "jpg", "jpeg"],
+        allowed_formats: ["png", "jpg", "jpeg", "webp"],
       },
       (error, result) => {
         if (error) reject(error);

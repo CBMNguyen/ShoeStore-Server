@@ -56,11 +56,16 @@ module.exports = {
 
     if (req.files) {
       // Upload to cloud
-      for (let i = 0; i < req.files.length; i++)
-        req.body.images[i] = await cloudinary.upload(
-          req.files[i].path,
-          process.env.CLOUD_FOLDER_UPLOAD
-        );
+      for (let i = 0; i < req.files.length; i++) {
+        try {
+          req.body.images[i] = await cloudinary.upload(
+            req.files[i].path,
+            process.env.CLOUD_FOLDER_UPLOAD
+          );
+        } catch (error) {
+          return res.status(500).json({ error });
+        }
+      }
     }
 
     try {

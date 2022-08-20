@@ -86,7 +86,9 @@ module.exports = {
               }
             );
 
-            res.status(200).json({ message: "Login successful", accessToken });
+            return res
+              .status(200)
+              .json({ message: "Login successful", accessToken });
           }
 
           const newUser = new User({
