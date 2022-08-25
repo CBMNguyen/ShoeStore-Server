@@ -98,6 +98,7 @@ module.exports = {
             email,
             password: process.env.EMPLOYEE_PW,
             image: picture,
+            phone: "",
           });
           const currentUser = await newUser.save(); // save in database
 
