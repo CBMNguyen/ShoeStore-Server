@@ -29,7 +29,13 @@ module.exports = {
   product_getById: async (req, res) => {
     const { productId } = req.params;
     try {
-      const product = await Product.findById({ _id: productId });
+      const product = await Product.findById({ _id: productId }).populate([
+        { path: "category" },
+        {
+          path: "productDetail",
+          populate: [{ path: "color" }, { path: "sizeAndQuantity.size" }],
+        },
+      ]);
       if (product) res.status(200).json({ product });
       else
         res

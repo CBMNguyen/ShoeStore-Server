@@ -1,0 +1,16 @@
+const mongoose = require("mongoose");
+
+const feedbackSchema = mongoose.Schema(
+  {
+    content: { type: String, required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee" },
+    reviewId: { type: mongoose.Schema.Types.ObjectId, ref: "Review" },
+  },
+  {
+    versionKey: false,
+    timestamps: true,
+  }
+);
+
+module.exports = mongoose.model("Feedback", feedbackSchema);
