@@ -6,7 +6,6 @@ const productSchema = mongoose.Schema(
     name: { type: String, unique: true, required: true },
     originalPrice: { type: Number, required: true },
     salePrice: { type: Number, required: true },
-    isFreeShip: { type: Boolean, default: false },
     promotionPercent: { type: Number, default: 0 },
     productDetail: [
       {
@@ -21,6 +20,7 @@ const productSchema = mongoose.Schema(
       },
     ],
     description: { type: String, required: true },
+    material: { type: String, required: true },
     quantityStock: { type: Number, default: 0 },
   },
   {
