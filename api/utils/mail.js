@@ -70,7 +70,7 @@ module.exports = (password) => {
               <tr>
                 <td style="text-align: center">
                   <h2>
-                    <a style="text-decoration: none;" href="http://localhost:3000/" title="logo" target="_blank">
+                    <a style="text-decoration: none;" href="https://shoestore-7857c.web.app/" title="logo" target="_blank">
                       Shoes Store
                       <img
                         src="https://res.cloudinary.com/h2kcloud/image/upload/v1659065926/ShoesStore/brandLogo_palmpf.png"

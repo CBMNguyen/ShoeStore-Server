@@ -22,6 +22,7 @@ const productSchema = mongoose.Schema(
     description: { type: String, required: true },
     material: { type: String, required: true },
     quantityStock: { type: Number, default: 0 },
+    state: { type: Boolean, default: false },
   },
   {
     versionKey: false,

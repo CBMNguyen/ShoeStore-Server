@@ -8,10 +8,10 @@ router.get("/", feedbackController.feedback_getAll);
 
 router.get("/:reviewId", feedbackController.feedback_getByReview);
 
-router.post("/", checkAuth, feedbackController.feedback_create);
+router.post("/", feedbackController.feedback_create);
 
-router.patch("/:feedbackId", checkAuth, feedbackController.feedback_update);
+router.patch("/:feedbackId", feedbackController.feedback_update);
 
-router.delete("/:feedbackId", checkAuth, feedbackController.feedback_delete);
+router.delete("/:feedbackId", feedbackController.feedback_delete);
 
 module.exports = router;

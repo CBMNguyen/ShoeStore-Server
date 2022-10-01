@@ -8,10 +8,10 @@ router.get("/", reviewController.review_getAll);
 
 router.get("/:productId", reviewController.review_getByProduct);
 
-router.post("/", checkAuth, reviewController.review_create);
+router.post("/", reviewController.review_create);
 
-router.patch("/:reviewId", checkAuth, reviewController.review_update);
+router.patch("/:reviewId", reviewController.review_update);
 
-router.delete("/:reviewId", checkAuth, reviewController.review_delete);
+router.delete("/:reviewId", reviewController.review_delete);
 
 module.exports = router;

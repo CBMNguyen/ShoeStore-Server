@@ -13,6 +13,11 @@ const employeeSchema = new mongoose.Schema(
       match:
         /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
     },
+    password: {
+      type: String,
+      required: true,
+      match: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/,
+    },
     address: { type: String, required: true },
     phone: {
       type: String,
@@ -26,6 +31,9 @@ const employeeSchema = new mongoose.Schema(
         "https://res.cloudinary.com/h2kcloud/image/upload/v1659461324/ShoesStore/avt_male_idrt86.jpg",
     },
     position: { type: mongoose.Schema.Types.ObjectId, ref: "Position" },
+    roles: [{ type: mongoose.Schema.Types.ObjectId, ref: "Role" }],
+    state: { type: Boolean, default: false },
+    isAdmin: { type: Boolean, default: false },
   },
   {
     versionKey: false,

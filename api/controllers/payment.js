@@ -1,5 +1,6 @@
 module.exports = {
   payment: (request, response) => {
+    console.log(request.body);
     //parameters
     const accessKey = process.env.ACCESSKEY;
     const secretKey = process.env.SECRETKEY;
@@ -19,11 +20,28 @@ module.exports = {
 
     //before sign HMAC SHA256 with format
     //accessKey=$accessKey&amount=$amount&extraData=$extraData&ipnUrl=$ipnUrl&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=$redirectUrl&requestId=$requestId&requestType=$requestType
-    const rawSignature = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData +
-      "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo + "&partnerCode=" +
-      partnerCode + "&redirectUrl=" + redirectUrl + "&requestId=" + requestId + "&requestType=" +
+    const rawSignature =
+      "accessKey=" +
+      accessKey +
+      "&amount=" +
+      amount +
+      "&extraData=" +
+      extraData +
+      "&ipnUrl=" +
+      ipnUrl +
+      "&orderId=" +
+      orderId +
+      "&orderInfo=" +
+      orderInfo +
+      "&partnerCode=" +
+      partnerCode +
+      "&redirectUrl=" +
+      redirectUrl +
+      "&requestId=" +
+      requestId +
+      "&requestType=" +
       requestType;
-    
+
     //signature
     const crypto = require("crypto");
     const signature = crypto
@@ -65,8 +83,9 @@ module.exports = {
     const req = https.request(options, (res) => {
       res.setEncoding("utf8");
       res.on("data", (data) => {
-        const {shortLink} = JSON.parse(data);
-        response.status(200).json({shortLink});
+        const { shortLink } = JSON.parse(data);
+        console.log(shortLink);
+        response.status(200).json({ shortLink });
       });
       res.on("end", () => {
         console.log("No more data in response.");
@@ -74,7 +93,9 @@ module.exports = {
     });
 
     req.on("error", (e) => {
-      response.status(500).json({message: `problem with request: ${e.message}`})
+      response
+        .status(500)
+        .json({ message: `problem with request: ${e.message}` });
     });
     req.write(requestBody);
     req.end();

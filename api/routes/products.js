@@ -19,6 +19,10 @@ router.patch(
   productController.product_update
 );
 
+router.patch("/state/:productId", productController.product_updateState);
+
+router.patch("/quantity/:productId", productController.product_updateQuantity);
+
 router.delete("/:productId", checkAuth, productController.product_delete);
 
 module.exports = router;

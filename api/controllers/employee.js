@@ -2,7 +2,6 @@ const Employee = require("../model/employee");
 const Position = require("../model/position");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const GENDER_IMAGE = require("../utils/common");
 const cloudinary = require("../utils/cloudinary.config");
 
 module.exports = {
@@ -28,19 +27,28 @@ module.exports = {
         return res.status(401).json({ message: "Email does not exist." });
       }
 
-      const result = await bcrypt.compare(password, process.env.EMPLOYEE_PW);
+      const result = await bcrypt.compare(password, employee[0].password);
 
       if (!result) {
         return res.status(401).json({ message: "Wrong password." });
       }
+
+      if (employee[0].state) {
+        return res
+          .status(401)
+          .json({ message: "Your account has been locked." });
+      }
+
       // create json web token
       const accessToken = jwt.sign(
         {
           employeeId: employee[0]._id,
           firstname: employee[0].firstname,
           lastname: employee[0].lastname,
-          position: employee[0].position,
-          imageUrl: employee[0].image,
+          isAdmin: employee[0].isAdmin,
+          image: employee[0].image,
+          roles: employee[0].roles,
+          state: employee[0].state,
         },
         process.env.JWT_KEY,
         {
@@ -74,13 +82,11 @@ module.exports = {
       gender,
       birthdate,
       email,
+      password,
       address,
       phone,
       position,
     } = req.body;
-
-    req.body.image =
-      gender === "male" ? GENDER_IMAGE.male : GENDER_IMAGE.female;
 
     if (req.file) {
       // Upload to cloud
@@ -110,16 +116,21 @@ module.exports = {
           .status(404)
           .json({ message: "No valid entry found provide by positionId" });
 
+      const salt = await bcrypt.genSalt(10);
+      const hashPassword = await bcrypt.hash(password, salt);
+
       const newEmployee = new Employee({
         firstname,
         lastname,
         gender,
         birthdate,
         email,
+        password: hashPassword,
         address,
         phone,
         image: req.body.image,
         position,
+        roles: JSON.parse(req.body.roles),
       });
 
       const employee = await newEmployee.save();
@@ -130,19 +141,28 @@ module.exports = {
       res.status(200).json({ message: "Employee created", employeeCreated });
     } catch (error) {
       res.status(500).json({ error });
+      console.log(error);
     }
   },
 
   // handle update Employee
   employee_update: async (req, res) => {
     const { employeeId } = req.params;
-
+    if (req.body.roles) {
+      req.body.roles = JSON.parse(req.body.roles);
+    }
     if (req.file) {
       // Upload to cloud
       req.body.image = await cloudinary.upload(
         req.file.path,
         process.env.CLOUD_FOLDER_UPLOAD
       );
+    }
+
+    if (req.body.password && req.body.password.length < 10) {
+      const salt = await bcrypt.genSalt(10);
+      const hashPassword = await bcrypt.hash(req.body.password, salt);
+      req.body.password = hashPassword;
     }
 
     try {
@@ -177,6 +197,7 @@ module.exports = {
         return res.status(409).json({ message: "Email already exists." });
       }
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error });
     }
   },

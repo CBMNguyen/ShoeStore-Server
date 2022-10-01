@@ -52,7 +52,7 @@ module.exports = {
       category,
       name,
       originalPrice,
-      isFreeShip,
+      material,
       promotionPercent,
       description,
       quantityStock,
@@ -102,26 +102,27 @@ module.exports = {
         originalPrice: parseFloat(originalPrice),
         promotionPercent: parseInt(promotionPercent),
         salePrice: parseFloat(originalPrice),
-        isFreeShip,
+        material,
         description,
         quantityStock: parseInt(quantityStock),
         productDetail,
       });
 
-      let product = await newProduct.save();
+      let productCreated = await newProduct.save();
 
-      const productCreated = await Product.findById({
-        _id: product._id,
-      }).populate([
-        { path: "category" },
-        {
-          path: "productDetail",
-          populate: [{ path: "color" }, { path: "sizeAndQuantity.size" }],
-        },
-      ]);
+      await productCreated
+        .populate([
+          { path: "category" },
+          {
+            path: "productDetail",
+            populate: [{ path: "color" }, { path: "sizeAndQuantity.size" }],
+          },
+        ])
+        .execPopulate();
 
       res.status(201).json({ message: "Added a new product.", productCreated });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error });
     }
   },
@@ -194,6 +195,34 @@ module.exports = {
         return res.status(409).json({ message: "Product already exist." });
       }
     } catch (error) {
+      res.status(500).json({ error });
+    }
+  },
+
+  product_updateState: async (req, res) => {
+    try {
+      await Product.updateOne(
+        { _id: req.params.productId },
+        { $set: { state: req.body.state } }
+      );
+      res
+        .status(200)
+        .json({ message: "Product updated.", state: req.body.state });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error });
+    }
+  },
+
+  product_updateQuantity: async (req, res) => {
+    try {
+      await Product.updateOne(
+        { _id: req.params.productId },
+        { $set: { ...req.body } }
+      );
+      res.status(200).json({ message: "Product updated." });
+    } catch (error) {
+      console.log(error);
       res.status(500).json({ error });
     }
   },

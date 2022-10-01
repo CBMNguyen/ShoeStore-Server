@@ -17,8 +17,16 @@ module.exports = {
   feedback_getByReview: async (req, res) => {
     try {
       const feedbacks = await Feedback.find({
-        feedbackId: req.params.feedbackId,
-      }).populate([{ path: "userId" }]);
+        reviewId: req.params.reviewId,
+      }).populate([
+        { path: "userId" },
+        { path: "employeeId" },
+        {
+          path: "feedbackId",
+          populate: [{ path: "userId" }, { path: "employeeId" }],
+        },
+        { path: "reviewId", populate: [{ path: "userId" }] },
+      ]);
       res
         .status(200)
         .json({ message: "Fetch feedback successfully.", feedbacks });
@@ -32,8 +40,20 @@ module.exports = {
     try {
       const newFeedback = new Feedback(req.body);
       await newFeedback.save();
+      await newFeedback
+        .populate([
+          { path: "userId" },
+          { path: "employeeId" },
+          { path: "reviewId", populate: [{ path: "userId" }] },
+          {
+            path: "feedbackId",
+            populate: [{ path: "userId" }, { path: "employeeId" }],
+          },
+        ])
+        .execPopulate();
       res.status(201).json({ message: "Added a new feedback.", newFeedback });
     } catch (error) {
+      console.log(error);
       res.status(500).json({ error });
     }
   },
@@ -61,6 +81,7 @@ module.exports = {
     const { feedbackId } = req.params;
     try {
       await Feedback.deleteOne({ _id: feedbackId });
+      await Feedback.deleteMany({ feedbackId: feedbackId });
       res.status(200).json({ message: "Feedback deleted." });
     } catch (error) {
       res.status(500).json({ error });

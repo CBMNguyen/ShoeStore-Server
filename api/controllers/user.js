@@ -2,29 +2,17 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../model/user");
-const mongoose = require("mongoose");
 const admin = require("../../config/firebase-config");
 const nodemailer = require("nodemailer");
 const shortid = require("shortid");
 const templateMail = require("../utils/mail");
-const GENDER_IMAGE = require("../utils/common");
 const cloudinary = require("../utils/cloudinary.config");
 
 module.exports = {
   // handle post signup
   user_signup: async (req, res, next) => {
-    const {
-      firstname,
-      lastname,
-      gender,
-      email,
-      password,
-      phone,
-      address,
-      birthdate,
-    } = req.body;
-
-    const image = gender === "male" ? GENDER_IMAGE.male : GENDER_IMAGE.female;
+    const { firstname, lastname, gender, email, password, phone, birthdate } =
+      req.body;
 
     try {
       const user = await User.find({ email });
@@ -51,8 +39,6 @@ module.exports = {
         email,
         password: hashPassword,
         phone,
-        image,
-        address,
         birthdate,
       });
       await newUser.save(); // save in database
@@ -72,6 +58,12 @@ module.exports = {
         if (decodeTokenValue) {
           const { name, picture, email } = decodeTokenValue;
           const user = await User.find({ email });
+
+          if (user.length >= 1 && user[0].state) {
+            return res
+              .status(401)
+              .json({ message: "Your account has been locked." });
+          }
 
           if (user.length >= 1) {
             const accessToken = jwt.sign(
@@ -107,6 +99,7 @@ module.exports = {
               userId: currentUser._id,
               firstname: currentUser.firstname,
               lastname: currentUser.lastname,
+              state: currentUser.state,
             },
             process.env.JWT_KEY,
             {
@@ -131,12 +124,20 @@ module.exports = {
         if (!result) {
           return res.status(401).json({ message: "Wrong password." });
         }
+
+        if (user[0].state) {
+          return res
+            .status(401)
+            .json({ message: "Your account has been locked." });
+        }
+
         // create json web token
         const accessToken = jwt.sign(
           {
             userId: user[0]._id,
             firstname: user[0].firstname,
             lastname: user[0].lastname,
+            state: user[0].state,
           },
           process.env.JWT_KEY,
           {
@@ -147,6 +148,7 @@ module.exports = {
       }
     } catch (error) {
       res.status(500).json({ error });
+      console.log(error);
     }
   },
 
@@ -196,7 +198,7 @@ module.exports = {
   // handle get all user
   user_getAll: async (req, res, next) => {
     try {
-      const users = await User.find().populate("cart");
+      const users = await User.find();
 
       res.status(200).json({ message: "Fetch users successfully.", users });
     } catch (error) {
@@ -220,18 +222,6 @@ module.exports = {
   // handle update user by Id
   user_update: async (req, res, next) => {
     const { userId } = req.params;
-    const {
-      firstname,
-      lastname,
-      birthdate,
-      email,
-      password,
-      phone,
-      gender,
-      image,
-      address,
-      orderAddress,
-    } = req.body;
 
     if (req.file) {
       // Upload to cloud
@@ -250,28 +240,15 @@ module.exports = {
         user = await User.updateOne({ _id: userId }, { $set: { ...req.body } });
       } else {
         // empty password
-        if (orderAddress) {
-          user = await User.updateOne(
-            { _id: userId },
-            { $set: { orderAddress } }
-          );
-        } else {
-          user = await User.updateOne(
-            { _id: userId },
-            {
-              $set: {
-                firstname,
-                lastname,
-                birthdate,
-                email,
-                phone,
-                gender,
-                image: req.body.image,
-                address,
-              },
-            }
-          );
-        }
+
+        user = await User.updateOne(
+          { _id: userId },
+          {
+            $set: {
+              ...req.body,
+            },
+          }
+        );
       }
       let userUpdated = await User.findOne({ _id: userId });
       userUpdated.password = null;
