@@ -13,4 +13,6 @@ router.patch("/:discountId", checkAuth, discountController.discount_update);
 
 router.delete("/:discountId", checkAuth, discountController.discount_delete);
 
+router.post("/sendMail", checkAuth, discountController.discount_sendMail);
+
 module.exports = router;

@@ -16,7 +16,7 @@ module.exports = (order) => {
     <head>
       <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
       <title>Delivered Email Template</title>
-      <meta name="description" content="Reset Password Email Template." />
+      <meta name="description" content="Delivered Email Template." />
 
       <style type="text/css">
         h2 {
@@ -109,7 +109,7 @@ module.exports = (order) => {
             >
           </h3>
   
-          <p class="text-center"  style=" width: 75%; margin-auto; color:  #6c757d; margin-top:3rem;margin-bottom:3rem;">
+          <p class="text-center"  style=" width: 75%; margin: 0 auto; color:  #6c757d; margin-top:3rem;margin-bottom:3rem;">
             <code style="color: cyan; font-weight: bold">Hi</code>
             <code style="font-weight: bold; color: deeppink;">${
               order.fullname
