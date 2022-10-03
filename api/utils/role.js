@@ -1,0 +1,8 @@
+const ROLES = {
+  ORDER_ROLE: "632930ca294dd32a0c8ec2bd",
+  PRODUCT_ROLE: "63292fd1294dd32a0c8ec2b8",
+  REVIEW_ROLE: "6329317b294dd32a0c8ec2c5",
+  IMPORT_ROLE: "632931dd294dd32a0c8ec2c8",
+  EMPLOYEE_ROLE: "6329321e294dd32a0c8ec2cb",
+};
+module.exports = ROLES;

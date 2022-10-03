@@ -2,27 +2,27 @@ const express = require("express");
 const router = express.Router();
 const upload = require("../utils/upload");
 const checkAuth = require("../midlewares/check-auth.js");
-const checkUser = require("../midlewares/check-user.js");
 
 const productController = require("../controllers/products");
+const checkProductRole = require("../midlewares/check-product-role");
 
 router.get("/", productController.product_getAll);
 
 router.get("/:productId", productController.product_getById);
 
-router.post("/", upload.array("images", 12), productController.product_create);
+router.post("/", checkProductRole, upload.array("images", 12), productController.product_create);
 
 router.patch(
   "/:productId",
-  checkUser,
+  checkProductRole,
   upload.array("images", 12),
   productController.product_update
 );
 
-router.patch("/state/:productId", productController.product_updateState);
+router.patch("/state/:productId", checkProductRole, productController.product_updateState);
 
-router.patch("/quantity/:productId", productController.product_updateQuantity);
+router.patch("/quantity/:productId", checkProductRole, productController.product_updateQuantity);
 
-router.delete("/:productId", checkAuth, productController.product_delete);
+router.delete("/:productId", checkProductRole, productController.product_delete);
 
 module.exports = router;
