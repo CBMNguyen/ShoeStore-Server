@@ -4,7 +4,7 @@ const checkAuth = require("../midlewares/check-auth.js");
 
 const addressController = require("../controllers/address");
 
-router.get("/:userId", checkAuth, addressController.address_getByUser);
+router.get("/:userId", addressController.address_getByUser);
 
 router.post("/", checkAuth, addressController.address_create);
 

@@ -4,7 +4,7 @@ const checkAuth = require("../midlewares/check-auth.js");
 
 const favouriteController = require("../controllers/favourite");
 
-router.get("/:userId", checkAuth, favouriteController.favourite_getByUser);
+router.get("/:userId", favouriteController.favourite_getByUser);
 
 router.post("/", checkAuth, favouriteController.favourite_create);
 
